@@ -7,7 +7,7 @@ on:
       branch:
         description: '要部署的分支'
         required: true
-        default: 'main'
+        default: 'dev'
         type: string
 
 jobs:
@@ -20,15 +20,58 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.branch }}
-          # 代码会被检出到 /home/lablog/lab-log/
+      
+      # 将代码同步到指定目录
+      - name: Sync to deploy directory
+        run: |
+          mkdir -p /home/lablog/lab-log
+          rsync -av --delete ./ /home/lablog/lab-log/
+      
+      # 复制离线包和工具
+      - name: Copy offline packages and tools
+        run: |
+          echo "📦 复制离线包和工具..."
+          if [ -d "/home/lablog/static-files/offline-packages" ]; then
+            cp -r /home/lablog/static-files/offline-packages /home/lablog/lab-log/docker/
+            echo "✅ offline-packages 复制完成"
+          else
+            echo "⚠️  /home/lablog/static-files/offline-packages 不存在，跳过"
+          fi
+          
+          if [ -d "/home/lablog/static-files/offline-tools" ]; then
+            cp -r /home/lablog/static-files/offline-tools /home/lablog/lab-log/docker/
+            echo "✅ offline-tools 复制完成"
+          else
+            echo "⚠️  /home/lablog/static-files/offline-tools 不存在，跳过"
+          fi
+      
+      # 复制 .env 文件
+      - name: Copy .env file
+        run: |
+          echo "📄 复制 .env 文件..."
+          if [ -f "/home/lablog/static-files/.env" ]; then
+            cp /home/lablog/static-files/.env /home/lablog/lab-log/docker/
+            echo "✅ .env 文件复制完成"
+          else
+            echo "❌ /home/lablog/static-files/.env 不存在"
+            exit 1
+          fi
+      
+      # 执行部署脚本
+      - name: Run deploy script
+        run: |
+          echo "🚀 开始执行部署脚本..."
+          chmod +x /home/lablog/lab-log/deploy/deploy.sh
+          if /home/lablog/lab-log/deploy/deploy.sh; then
+            echo "✅ 部署成功完成"
+          else
+            echo "❌ 部署失败"
+            exit 1
+          fi
       
       - name: Show deployment info
         run: |
           echo "✅ 代码已成功部署到服务器"
-          echo "📁 部署位置: $(pwd)"
           echo "🌿 部署分支: ${{ github.event.inputs.branch }}"
           echo "🔖 提交哈希: $(git rev-parse --short HEAD)"
           echo ""
-          echo "📋 后续操作请手动执行："
-          echo "   1. cd $(pwd)"
-          echo "   2. docker-compose up -d"

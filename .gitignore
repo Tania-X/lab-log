@@ -39,6 +39,7 @@ __pycache__/
 # 环境变量文件
 .env
 .env.local
+docker/.env
 
 # Arduino 敏感配置文件
 **/secrets.h
@@ -46,3 +47,10 @@ __pycache__/
 # SSH 密钥
 log-camera
 log-camera.pub
+
+# 离线部署文件
+docker/offline-packages/
+docker/offline-tools/
+
+# AI编程规范文件（根据实际情况添加）
+CLINE.md
