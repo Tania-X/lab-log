@@ -12,13 +12,18 @@ def mock_connection():
 @pytest.fixture
 def mock_cursor():
     """模拟数据库游标"""
-    return MagicMock()
+    cursor = MagicMock()
+    # 配置上下文管理器：with cursor as c: 中的 c 就是 cursor 本身
+    cursor.__enter__ = MagicMock(return_value=cursor)
+    cursor.__exit__ = MagicMock(return_value=False)
+    return cursor
 
 @pytest.fixture
 def mock_db_client(mock_connection, mock_cursor):
     """模拟SeekDBClient实例"""
     with patch('storage.seekdb_client.pymysql.connect') as mock_connect:
         mock_connect.return_value = mock_connection
+        # cursor() 返回 mock_cursor，且 mock_cursor 已配置好 __enter__
         mock_connection.cursor.return_value = mock_cursor
         client = SeekDBClient()
         yield client
@@ -131,7 +136,8 @@ class TestSeekDBClientCRUD:
         """测试用户不存在的情况"""
         mock_cursor.fetchone.return_value = None
 
-        with pytest.raises(ValueError, match="用户 user_001 不存在"):
+        # 实际代码捕获 ValueError 并包装为 RuntimeError
+        with pytest.raises(RuntimeError, match="获取用户公钥失败: 用户 user_001 不存在"):
             mock_db_client.get_user_public_key("user_001")
 
 class TestSeekDBClientEncryption:

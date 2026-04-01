@@ -79,8 +79,11 @@ def sample_emergency():
 @pytest.fixture(scope="session")
 def sample_video_result():
     """示例视频理解结果"""
-    from video_processing.interface import VideoUnderstandingResult, EventLog, PersonInfo
+    from video_processing.interface import VideoUnderstandingResult
+    from storage.models import EventLog
     return VideoUnderstandingResult(
+        segment_id="result_seg_001",
+        remark="示例视频理解结果",
         events=[
             EventLog(
                 event_id="result_event_001",
@@ -91,10 +94,5 @@ def sample_video_result():
                 structured={"person_id": "p1", "equipment": ["试管"]},
                 raw_text="用户操作试管"
             )
-        ],
-        persons=[
-            PersonInfo(person_id="p1", appearance="身穿白大褂的研究员")
-        ],
-        equipment=["试管", "烧杯"],
-        emergencies=[]
+        ]
     )
