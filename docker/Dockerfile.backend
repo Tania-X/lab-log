@@ -11,7 +11,7 @@ RUN chmod +x /usr/local/bin/ffmpeg /usr/local/bin/ffprobe
 
 # 从本地 COPY 预下载的 Python 包并安装（无需联网）
 COPY docker/offline-packages /offline-packages
-COPY docker/requirements.txt /app/
+COPY requirements.txt /app/
 RUN pip install --no-index --find-links=/offline-packages -r requirements.txt
 
 # 复制项目代码

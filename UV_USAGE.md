@@ -1,95 +1,115 @@
-# 使用 uv 管理 Python 环境和依赖
+# 使用 uv 管理 Python 环境和依赖 (Windows)
 
-本项目已配置使用 `uv` 来管理 Python 环境和依赖包。
+本项目使用 `uv` 来管理 Python 环境和依赖包。uv 会自动管理虚拟环境，无需手动激活。
+
+## 环境要求
+
+- Windows 10/11
+- 已安装 uv（安装方式见下文）
+
+## 安装 uv
+
+```powershell
+# 使用 pip 安装
+pip install uv
+
+# 或使用 PowerShell 脚本安装（推荐）
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
 
 ## 快速开始
 
-### 1. 创建虚拟环境
+### 1. 进入项目目录
 
-```bash
-cd /root/lab-log
-uv venv
+```powershell
+# 改为自己的目录
+cd D:\my_projects\lab-log
 ```
 
-这会创建 `.venv` 目录作为虚拟环境。
+### 2. 同步依赖
 
-### 2. 激活虚拟环境
-
-```bash
-source .venv/bin/activate
+```powershell
+uv sync
 ```
 
-或者使用 uv 直接运行命令（无需激活）：
+这会读取 `pyproject.toml` 和 `uv.lock` 文件，自动安装所有依赖。
 
-```bash
-uv run python scripts/init_database.py
-```
+### 3. 使用 uv 运行命令
 
-### 3. 安装依赖
-
-```bash
-# 使用 requirements.txt
-uv pip install -r requirements.txt
-
-# 或使用 pyproject.toml（如果配置了）
-uv pip install -e .
-```
-
-### 4. 使用 uv 运行命令
-
-```bash
+```powershell
 # 运行脚本
 uv run python scripts/init_database.py
 
 # 运行 API 服务器
-uv run uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+uv run uvicorn web_api.main:app --reload --host 0.0.0.0 --port 8000
 
 # 运行其他 Python 脚本
-uv run python scripts/process_video.py ...
+uv run python scripts/process_video.py
 ```
+
+> **注意**：使用 `uv run` 时，uv 会自动使用项目依赖，无需手动激活虚拟环境。
 
 ## 镜像源配置
 
-已配置使用清华镜像源加速下载，配置文件位于 `.uv/config.toml`：
+已配置使用清华镜像源加速下载，配置位于 `pyproject.toml`：
 
 ```toml
-index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
 ```
 
-如果需要使用其他镜像源，可以修改该文件或使用环境变量：
+如需临时使用其他镜像源，可设置环境变量：
 
-```bash
-export UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+```powershell
+# CMD
+set UV_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+
+# PowerShell
+$env:UV_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
 ```
 
 ## 常用命令
 
-```bash
+```powershell
+# 同步依赖（根据 pyproject.toml 和 uv.lock）
+uv sync
+
+# 添加新依赖
+uv add package_name
+
+# 添加开发依赖
+uv add --dev package_name
+
 # 查看已安装的包
 uv pip list
 
-# 安装新包
-uv pip install package_name
+# 更新依赖
+uv sync --upgrade
 
-# 更新包
-uv pip install --upgrade package_name
+# 运行 Python 脚本
+uv run python script.py
 
-# 卸载包
-uv pip uninstall package_name
-
-# 同步依赖（根据 requirements.txt）
-uv pip sync requirements.txt
+# 进入 Python 交互式环境
+uv run python
 ```
+
+## 项目结构说明
+
+- `pyproject.toml` - 项目配置和依赖定义
+- `uv.lock` - 依赖锁定文件（确保环境一致性）
+- `.venv/` - uv 自动管理的虚拟环境目录（已在 .gitignore 中）
 
 ## 优势
 
 - **速度快**：uv 使用 Rust 编写，比 pip 快 10-100 倍
 - **可靠**：更好的依赖解析和锁定
 - **简单**：统一的工具管理虚拟环境和包
+- **无需激活**：使用 `uv run` 自动处理环境
 
 ## 注意事项
 
-- 虚拟环境位于 `.venv/` 目录
+- 虚拟环境位于 `.venv/` 目录，由 uv 自动管理
 - `.venv/` 已在 `.gitignore` 中，不会提交到版本控制
-- 使用 `uv run` 时无需手动激活虚拟环境
-
+- 所有操作都使用 `uv` 命令，无需手动激活虚拟环境
+- 依赖定义统一在 `pyproject.toml` 中管理
