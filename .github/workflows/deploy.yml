@@ -27,25 +27,7 @@ jobs:
           mkdir -p /home/lablog/lab-log
           rsync -av --delete ./ /home/lablog/lab-log/
       
-      # 复制离线包和工具
-      - name: Copy offline packages and tools
-        run: |
-          echo "📦 复制离线包和工具..."
-          if [ -d "/home/lablog/static-files/offline-packages" ]; then
-            cp -r /home/lablog/static-files/offline-packages /home/lablog/lab-log/docker/
-            echo "✅ offline-packages 复制完成"
-          else
-            echo "⚠️  /home/lablog/static-files/offline-packages 不存在，跳过"
-          fi
-          
-          if [ -d "/home/lablog/static-files/offline-tools" ]; then
-            cp -r /home/lablog/static-files/offline-tools /home/lablog/lab-log/docker/
-            echo "✅ offline-tools 复制完成"
-          else
-            echo "⚠️  /home/lablog/static-files/offline-tools 不存在，跳过"
-          fi
-      
-      # 复制 .env 文件
+      # 创建 .env 文件
       - name: Copy .env file
         run: |
           echo "📄 复制 .env 文件..."
