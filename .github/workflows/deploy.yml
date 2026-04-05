@@ -32,6 +32,7 @@ jobs:
         run: |
           echo "📦 复制离线工具uv..."
           if [ -d "/home/lablog/repo/uvrepo" ]; then
+            mkdir -p /home/lablog/lab-log/docker/offline-tools
             cp /home/lablog/repo/uvrepo/uv /home/lablog/lab-log/docker/offline-tools/uv
             cp /home/lablog/repo/uvrepo/uvx /home/lablog/lab-log/docker/offline-tools/uvx
             echo "✅ offline-tools 复制完成"
