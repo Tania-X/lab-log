@@ -27,6 +27,18 @@ jobs:
           mkdir -p /home/lablog/lab-log
           rsync -av --delete ./ /home/lablog/lab-log/
       
+      # 复制离线工具
+      - name: Copy offline tools
+        run: |
+          echo "📦 复制离线工具uv..."
+          if [ -d "/home/lablog/repo/uvrepo" ]; then
+            cp /home/lablog/repo/uvrepo/uv /home/lablog/lab-log/docker/offline-tools/uv
+            cp /home/lablog/repo/uvrepo/uvx /home/lablog/lab-log/docker/offline-tools/uvx
+            echo "✅ offline-tools 复制完成"
+          else
+            echo "⚠️  /home/lablog/repo/uvrepo 不存在，跳过"
+          fi
+      
       # 创建 .env 文件
       - name: Copy .env file
         run: |
