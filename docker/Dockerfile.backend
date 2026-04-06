@@ -1,5 +1,4 @@
-# TODO: 镜像源就绪后改为slim
-FROM python:3.10
+FROM python:3.10-slim
 
 WORKDIR /app
 
